@@ -1,10 +1,10 @@
-package com.leonardoramos.paymentservice.service;
+package com.leonardoramos.notificationservice.service;
 
-import com.leonardoramos.paymentservice.events.OrderCreatedEvent;
-import com.leonardoramos.paymentservice.model.Payment;
-import com.leonardoramos.paymentservice.model.ProcessedEvent;
-import com.leonardoramos.paymentservice.repository.PaymentRepository;
-import com.leonardoramos.paymentservice.repository.ProcessedEventRepository;
+import com.leonardoramos.notificationservice.events.OrderCreatedEvent;
+import com.leonardoramos.notificationservice.model.Notification;
+import com.leonardoramos.notificationservice.model.ProcessedEvent;
+import com.leonardoramos.notificationservice.repository.NotificationRepository;
+import com.leonardoramos.notificationservice.repository.ProcessedEventRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -13,29 +13,30 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.UUID;
+
 @Service
-public class IdempotentPaymentListener {
-    private final PaymentRepository paymentRepository;
-    private final ProcessedEventRepository eventRepository;
+public class IdempotentNotificationListener {
+    private final NotificationRepository notificationRepository;
+    private final ProcessedEventRepository processedEventRepository;
     private final PlatformTransactionManager transactionManager;
 
-    public IdempotentPaymentListener(
-            PaymentRepository paymentRepository,
-            ProcessedEventRepository eventRepository,
-            PlatformTransactionManager transactionManager) {
-        this.paymentRepository = paymentRepository;
-        this.eventRepository = eventRepository;
+    public IdempotentNotificationListener(NotificationRepository notificationRepository,
+                                          ProcessedEventRepository processedEventRepository,
+                                          PlatformTransactionManager transactionManager) {
+        this.notificationRepository = notificationRepository;
+        this.processedEventRepository = processedEventRepository;
         this.transactionManager = transactionManager;
     }
 
     @KafkaListener(
             topics = "orders",
-            groupId = "payment-group-idempotent"
+            groupId = "notification-group-idempotent"
     )
     @Transactional
     public void handleOrderEvent(OrderCreatedEvent event) {
 
-        if (eventRepository.existsById(event.getEventId())) {
+        if (processedEventRepository.existsById(event.getEventId())) {
             System.out.println("Evento duplicado recebido (ignorado): " + event.getEventId());
             return;
         }
@@ -43,11 +44,11 @@ public class IdempotentPaymentListener {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         try {
-            Payment payment = new Payment(null,event.getOrderId(), event.getTotalAmount());
-            paymentRepository.save(payment);
+            Notification payment = new Notification(null,event.getOrderId());
+            notificationRepository.save(payment);
 
             ProcessedEvent processed = new ProcessedEvent(event.getEventId());
-            eventRepository.save(processed);
+            processedEventRepository.save(processed);
 
             transactionManager.commit(status);
             System.out.println("Pagamento processado (IDEMPOTENTE): " + event.getOrderId());
@@ -62,7 +63,7 @@ public class IdempotentPaymentListener {
             transactionManager.rollback(status);
             System.err.println("Falha ao processar pagamento: " + e.getMessage());
 
-            // Importante: Lançar a exceção para que o Spring/Kafka NÃO comite o offset, forçando
+            // Importante: Lançar a exceção para que o Spring/Kafka NÃO comite o offset, forçando a re-entrega.
             throw new RuntimeException("Falha no processamento, será tentado novamente.", e);
         }
     }

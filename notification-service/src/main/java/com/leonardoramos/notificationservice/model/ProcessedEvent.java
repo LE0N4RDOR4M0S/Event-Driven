@@ -1,4 +1,4 @@
-package com.leonardoramos.paymentservice.model;
+package com.leonardoramos.notificationservice.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

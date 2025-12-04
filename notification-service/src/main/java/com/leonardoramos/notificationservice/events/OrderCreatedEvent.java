@@ -1,4 +1,4 @@
-package com.leonardoramos.paymentservice.events;
+package com.leonardoramos.notificationservice.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

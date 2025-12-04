@@ -1,7 +1,7 @@
 # Event-Driven Architecture (EDA) com Spring Boot & Kafka
 
 ![Java](https://img.shields.io/badge/Java-17%2B-ed8b00?style=for-the-badge\&logo=openjdk\&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-6db33f?style=for-the-badge\&logo=spring\&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.7-6db33f?style=for-the-badge\&logo=spring\&logoColor=white)
 ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231f20?style=for-the-badge\&logo=apachekafka\&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ed?style=for-the-badge\&logo=docker\&logoColor=white)
 

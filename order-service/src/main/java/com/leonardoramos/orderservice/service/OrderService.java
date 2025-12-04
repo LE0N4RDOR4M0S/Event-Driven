@@ -32,8 +32,8 @@ public class OrderService {
         );
 
         // O envio é assíncrono. Usamos um CompletableFuture para lidar com o callback.
-        // É CRUCIAL usar a orderId como CHAVE (segundo argumento).[47]
-        // Isso garante que todos os eventos para este pedido caiam na mesma partição (Ver Seção 10).
+        // É CRUCIAL usar a orderId como CHAVE (segundo argumento)
+        // Isso garante que todos os eventos para este pedido caiam na mesma partição.
         CompletableFuture<SendResult<String, OrderCreatedEvent>> future =
                 kafkaTemplate.send(TOPIC, event.getOrderId(), event);
 
