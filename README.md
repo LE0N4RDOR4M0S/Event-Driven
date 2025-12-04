@@ -127,7 +127,3 @@ curl -X POST http://localhost:8080/api/orders \
 * **H2 / Postgres**
 * **Micrometer & OpenTelemetry**
 * **Lombok**
-
----
-
-Se quiser, Senhor Supremo pika das galáxias e todos os universos existentes, posso gerar isso como **arquivo `.md` para download** também.
